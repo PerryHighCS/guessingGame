@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Guessing Game</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header clearfix">
+      <h3 class="text-muted">Guess the number!</h3>
+      <nav>
+        <ul class="nav nav-pills" role="tablist">
+          <li role="presentation" class="active"><a href="#youguess" role="tab" data-toggle="pill">You Guess</a></li>
+          <li role="presentation"><a href="#iguess" aria-controls="iguess" role="tab" data-toggle="pill">I Guess</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="tab-content">
+        
+        <div role="tabpanel" class="tab-pane active fade in" id="youguess">
+            I'm thinking of a number between 1 and _
+        </div> <!-- /youguess -->
+        
+        <div role="tabpanel" class="tab-pane fade" id="iguess">
+            Pick a number between 1 and _
+        </div> <!-- /iguess -->
+        
+    </div>
+</div> <!-- /container -->
+</body>
+</html>
