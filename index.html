@@ -83,7 +83,7 @@
                                 Lower
                             </button>
                         </span>
-                        <input type="number" id="myGuess" 
+                        <input type="text" id="myGuess" 
                                class="form-control text-center" readonly/>
                         <span class="input-group-btn">
                             <button type="button" id="higherGuess" class="btn btn-primary">
@@ -201,6 +201,7 @@ function startGame(difficulty) {
     startButton.show();
     
     bothGuessList.hide();    
+    bothGuessButton.hide();
     bothStart.show();    
     
     beforePrompt.show();
@@ -231,7 +232,6 @@ function userGuess(evt) {
 
 function showGuesses(guesses, list, guessNum, nextGuessNum) {    
     list.empty();
-    console.log(guesses);
     
     guesses.forEach((guess, i) => {
         let li = $('<li class="list-group-item">');
@@ -291,7 +291,7 @@ function gotIt() {
 
 function doGuess(call) {
     let num = call();
-    myGuess.val(num);
+    myGuess.val(num.toLocaleString());
     
     let hist = game.guessHistory;
     
@@ -318,7 +318,6 @@ function guessMyOwnNum() {
 }
 
 function selfGuess(call) {
-    console.log (call);
     let num = call();
     let result = selfgame.madeGuess(num);
     
@@ -343,9 +342,8 @@ function selfGuess(call) {
     
     
     let hist = selfgame.userHistory;
-    console.log(hist);
     
-    updateDisplay(selfgame.secretNumber, secretNum);
+    updateDisplay(selfgame.secretNumber.toLocaleString(), secretNum);
     
     showGuesses(hist, bothGuessList, numMyGuesses);
 }

@@ -82,7 +82,6 @@ export class GuessingGame {
     }
     
     guessHigher() {
-        console.log("here");
         this.guesses.push({val: this.guess, prompt: "HIGHER"});
         this.guessMin = this.guess + 1;
         
@@ -90,7 +89,6 @@ export class GuessingGame {
     }
     
     guessLower() {
-        console.log("lere");
         this.guesses.push({val: this.guess, prompt: "LOWER"});
         this.guessMax = this.guess - 1;
         
