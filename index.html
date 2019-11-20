@@ -139,7 +139,7 @@
 </div> <!-- /container -->
 
 <script type="module">
-import {GuessingGame, updateDisplay} from "./guessingGame.js"
+import {GuessingGame} from "./guessingGame.js"
 
 var game;
 var selfgame;
@@ -171,6 +171,17 @@ var guessingPrompt = $('.prompt-guessing');
 var numMyGuesses = $('.numMyGuesses');
 var selfGuessedIt = $('#selfgotit');
 var secretNum = $('.secretNumber');
+
+
+/**
+ * Update the contents of an element on the display
+ * @param {Number|String} val the new value to display
+ * @param {String} disp the jquery selector for the element to update
+ * @returns {undefined}
+ */
+export function updateDisplay(val, disp) {
+    $(disp).text(val); 
+}
 
 /**
  * (Re)start the guessing games using the difficulty slider's value
