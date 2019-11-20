@@ -65,10 +65,10 @@ export class GuessingGame {
     
     makeGuess() {
         if (this.guessMin > this.guessMax) {
-            return -1;
+            return;
         }
         
-        this.guess = Math.floor((this.guessMax - this.guessMin) / 2);
+        this.guess = Math.floor((this.guessMax - this.guessMin) / 2) + this.guessMin;
         
         return this.guess;
     }
@@ -78,15 +78,26 @@ export class GuessingGame {
     }
     
     guessHigher() {
+        this.guesses.push({val: this.guess, prompt: "HIGHER"});
         this.guessMin = this.guess + 1;
         
         return this.makeGuess();
     }
     
     guessLower() {
+        this.guesses.push({val: this.guess, prompt: "LOWER"});
         this.guessMax = this.guess - 1;
         
         return this.makeGuess();
+    }
+    
+    guessGood() {
+        if (this.guesses.length === 0 || 
+                this.guesses[this.guesses.length - 1].val !== this.guess) {
+            this.guesses.push({val: this.guess, prompt: "GOT IT!"});
+        }
+        
+        return;
     }
 }
 
