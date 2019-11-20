@@ -2,6 +2,10 @@ body {
     font-size: x-large;
 }
 
+.clear {
+    clear:both;
+    line-height:0;
+}
 .startButton {
     margin-top: 20px;
 }

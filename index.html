@@ -33,69 +33,77 @@
         <div role="tabpanel" class="tab-pane fade in active" id="youguess">
             I'm thinking of a number between 1 and <span class="max"></span>.
             Can you guess it in <span class="maxGuesses"></span> guesses?
-            <div class="input-group">
-                <span class="input-group-addon">
-                     Guess <span class="numUserGuess">1</span>:
-                </span>
-                <input type="number" id="nextGuess" class="form-control"
-                        placeholder="Your Guess" min="1"
-                        oninput="(!validity.rangeOverflow||(value=this.max)) 
-                                 && (!validity.rangeUnderflow||(value=this.min))
-                                 && (!validity.stepMismatch||(value=parseInt(this.value)))"
-                        />
-                <span class="input-group-btn">
-                    <button type="button" id="userGuess" class="btn btn-primary">
-                        Guess
-                    </button>
-                </span>
-            </div>
-            <div class="alert alert-info userPrompt" id="guesshigher" role="alert">
-                Guess Higher!
-            </div>
-            <div class="alert alert-info userPrompt" id="guesslower" role="alert">
-                Guess Lower!
-            </div>
-            <div class="alert alert-success userPrompt" id="gotit" role="alert">
-                You got it in <span class="numUserGuesses"></span>!
-                <button class="btn btn-primary pull-right again">Again!</button>
-            </div>
-            <ol class="list-group" style="display: none;" id="userGuessList">
+            <div id="userguesses" class="col-md-4 col-md-offset-4">
+                <ol class="list-group" style="display: none;" id="userGuessList">
 
-            </ol>
+                </ol>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                         Guess <span class="numUserGuess">1</span>:
+                    </span>
+                    <input type="number" id="nextGuess" class="form-control"
+                            placeholder="Your Guess" min="1"
+                            oninput="(!validity.rangeOverflow||(value=this.max)) 
+                                     && (!validity.rangeUnderflow||(value=this.min))
+                                     && (!validity.stepMismatch||(value=parseInt(this.value)))"
+                            />
+                    <span class="input-group-btn">
+                        <button type="button" id="userGuess" class="btn btn-primary">
+                            Guess
+                        </button>
+                    </span>
+                </div>
+                <div class="alert alert-info userPrompt" id="guesshigher" role="alert">
+                    Guess Higher!
+                </div>
+                <div class="alert alert-info userPrompt" id="guesslower" role="alert">
+                    Guess Lower!
+                </div>
+                <div class="alert alert-success userPrompt" id="gotit" role="alert">
+                    You got it in <span class="numUserGuesses"></span>!
+                    <button class="btn btn-primary pull-right again">Again!</button>
+                </div>
+            </div>
         </div> <!-- /youguess -->
         
         <div role="tabpanel" class="tab-pane fade" id="iguess">
             Pick a number between 1 and <span class="max"></span>.
             I'll guess it in <span class="maxGuesses"></span> guesses.
             
-            <ol class="list-group" style="display: none;" id="guessList">
+            <div id="myguesses" class="col-md-4 col-md-offset-4">
+                <ol class="list-group" style="display: none;" id="guessList">
 
-            </ol>
-            <div class="startButton">
-                <button class="btn btn-success btn-lg btn-block">Start Guessing</button>
-            </div>
-            <div id="compGuesses" style="display: none;">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        I Guess:
-                    </span>
-                    <input type="number" id="myGuess" class="form-control" readonly/>
-                    <span class="input-group-btn">
-                        <button type="button" id="lowerGuess" class="btn btn-primary">
-                            Lower
-                        </button>
-                        <button type="button" id="goodGuess" class="btn btn-success">
-                            That's It!
-                        </button>
-                        <button type="button" id="higherGuess" class="btn btn-primary">
-                            Higher
-                        </button>
-                    </span>
+                </ol>
+                <div class="startButton">
+                    <button class="btn btn-success btn-lg btn-block">Start Guessing</button>
                 </div>
-            </div>
-            <div class="alert alert-success userPrompt" id="igotit" role="alert">
-                I got it in <span class="numGuesses"></span>!
-                <button class="btn btn-primary pull-right again">Again!</button>
+                <div id="compGuesses" style="display: none;" class="btn-group-vertical">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button type="button" id="lowerGuess" class="btn btn-primary">
+                                Lower
+                            </button>
+                        </span>
+                        <input type="number" id="myGuess" class="form-control" readonly/>
+                        <span class="input-group-btn">
+                            <button type="button" id="higherGuess" class="btn btn-primary">
+                                Higher
+                            </button>
+                        </span>
+                    </div>
+
+                    <button type="button" id="goodGuess" class="btn btn-success btn-block">
+                        That's It!
+                    </button>
+                </div>
+                <div class="alert alert-success userPrompt" id="igotit" role="alert">
+                    I got it in <span class="numGuesses"></span>!
+                    <button class="btn btn-primary pull-right again">Again!</button>
+                </div>
+                <div class="alert alert-warning userPrompt" id="error" role="alert">
+                    Are you messing with me?
+                    <button class="btn btn-primary pull-right again">Again!</button>
+                </div>
             </div>
         </div> <!-- /iguess -->
     </div> <!-- tab content -->
@@ -121,6 +129,7 @@ var good = $('#goodGuess');
 var higher = $('#higherGuess');
 var numGuesses = $('.numGuesses');
 var guessedIt = $('#igotit');
+var error = $('#error');
 
 function startGame(difficulty) { 
     
@@ -143,6 +152,8 @@ function startGame(difficulty) {
     
     guessedIt.hide();
     guessList.hide();
+    error.hide();
+    compGuesses.hide();
     startButton.show();
 }
 
@@ -174,11 +185,19 @@ function showGuesses(guesses, list, guessNum, nextGuessNum ) {
     guesses.forEach((guess, i) => {
         let li = $('<li class="list-group-item">');
         
-        let item = $('<span>');
-        item.text((i + 1) + ") " + guess.val);        
+        let item = $('<span class="list-group-item-heading">');
+        
+        let num = $('<span style="font-size: .75em;">');
+        num.text((i + 1) + ".");        
+        item.append(num);
+        
+        num = $('<span style="margin-left: 20px;">');
+        num.text(guess.val);        
+        item.append(num);
+               
         li.append(item);
         
-        let prompt = $('<span class="badge">');
+        let prompt = $('<div class="badge" style="font-size: .5em;">');
         prompt.text(guess.prompt);
         li.append(prompt);
         
@@ -220,6 +239,11 @@ function doGuess(call) {
         // No guess was made        
         compGuesses.hide();
         guessedIt.show();
+    }
+    if (num < 0) {
+        // An error occurred        
+        compGuesses.hide();
+        error.show();
     }
     
     showGuesses(hist, guessList, numGuesses);

@@ -65,7 +65,7 @@ export class GuessingGame {
     
     makeGuess() {
         if (this.guessMin > this.guessMax) {
-            return;
+            return -1;
         }
         
         this.guess = Math.floor((this.guessMax - this.guessMin) / 2) + this.guessMin;
