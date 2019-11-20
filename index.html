@@ -144,6 +144,7 @@ import {GuessingGame, updateDisplay} from "./guessingGame.js"
 var game;
 var selfgame;
 
+// Create variables for UI controls
 var difficultySlider = $('#difficulty');
 var userGuessInput = $('#nextGuess');
 var userGuessButton = $('#userGuess');
@@ -171,48 +172,62 @@ var numMyGuesses = $('.numMyGuesses');
 var selfGuessedIt = $('#selfgotit');
 var secretNum = $('.secretNumber');
 
-function startGame(difficulty) { 
-    
-    difficulty = parseInt(difficultySlider.val());
+/**
+ * (Re)start the guessing games using the difficulty slider's value
+ */
+function startGame() {
+    // Calculate and update the difficulty value
+    let difficulty = parseInt(difficultySlider.val());
     updateDisplay(difficulty, '#difficultyval');
     
     // calculate the range for guessing
     let max = Math.pow(10, difficulty);
     
+    // Restart both the individual guess and computer against itself games
     game = new GuessingGame(max);
     selfgame = new GuessingGame(max);
     
+    // Limit the user input to the calculated maximum
     userGuessInput.prop('max', max);
     
+    // Display the correct maximum number and number of guesses available
     updateDisplay(max.toLocaleString(),'.max');
     updateDisplay(game.maxGuesses.toLocaleString(), '.maxGuesses');
     updateDisplay(1, numNextUserGuess);
+    
+    // Hide controls that shouldn't be shown at the beginning of the game
     $('.userPrompt').hide();
     $('.compPrompt').hide();
     $('.selfPrompt').hide();
-    
-    
+        
     userGuessList.hide();
     
     guessedIt.hide();
     guessList.hide();
     error.hide();
     compGuesses.hide();
-    startButton.show();
     
     bothGuessList.hide();    
     bothGuessButton.hide();
-    bothStart.show();    
     
-    beforePrompt.show();
     guessingPrompt.hide();
+    
+    // Show controls that should be shown at the beginning of the game
+    startButton.show();
+    bothStart.show();    
+    beforePrompt.show();    
 }
 
-function userGuess(evt) {
+/**
+ * Take the user's guess
+ */
+function userGuess() {
+    // Get the guess and pass it to the game
     let result = game.madeGuess(userGuessInput.val());    
     
     $('.userPrompt').hide();
 
+    // Determine how the guess faired
     if (result === "GOT IT!") {
         // The player guessed it
         $('#gotit').show();
@@ -227,39 +242,57 @@ function userGuess(evt) {
         $('#guesslower').show();
     }
     
+    // Add the guess to the history display
     showGuesses(game.userHistory, userGuessList, numUserGuesses, numNextUserGuess);
 }
 
+/**
+ * Display the history of guesses for a game
+ * 
+ * @param guesses{object[]} the history of guesses
+ * @param list a jquery object holding the list of guesses
+ * @param guessNum a jquery object to hold the number of guesses made so far
+ * @param nextGuessNum a jquery object to hold the number of the next guess to be made
+ */
 function showGuesses(guesses, list, guessNum, nextGuessNum) {    
     list.empty();
     
+    // Loop through all guesses in the guesses list
     guesses.forEach((guess, i) => {
+        // Create a list item for each one
         let li = $('<li class="list-group-item">');
         
+        // Create a span to display the guess
         let item = $('<span class="list-group-item-heading">');
         
+        // Number the guesses
         let num = $('<span style="font-size: .75em;">');
         num.text((i + 1) + ".");        
         item.append(num);
         
+        // Add the number that was guessed
         num = $('<span style="margin-left: 20px;">');
         num.text(guess.val.toLocaleString());        
         item.append(num);
-               
+        
+        // Add the guess to the list item
         li.append(item);
         
+        // Display the higher/lower badge for the guess
         let prompt = $('<div class="badge" style="font-size: 1em;">');
-        prompt.text(guess.prompt);
-        
+        prompt.text(guess.prompt);        
         li.append(prompt);
         
+        // Add the guess to the history display
         list.append(li);
     });
     
-    
+    // Display how many guesses have been made, and what number the next one
+    // will be
     updateDisplay(guesses.length, guessNum);
     updateDisplay(guesses.length + 1, nextGuessNum);
     
+    // Show/hide the list of guesses and scroll to the bottom of it.
     if (guesses.length > 0) {
         list.show();
         $("html, body").animate({ scrollTop: $(document).height() }, "slow");
@@ -270,59 +303,97 @@ function showGuesses(guesses, list, guessNum, nextGuessNum) {
     }
 }
 
+/**
+ * The computer should make its first guess.
+ */
 function makeGuess() {
+    // Update the available controls
     startButton.hide();
     compGuesses.show();
     
+    // Make and display the guess
     doGuess(()=>game.makeGuess());
 }
 
+/**
+ * The computer should make another, lower guess
+ */
 function guessLower() {
     doGuess(()=>game.guessLower());    
 }
 
+/**
+ * The computer should make another, higher guess
+ */
 function guessHigher() {
     doGuess(()=>game.guessHigher());  
 }
 
+/**
+ * The computer got the correct number!
+ */
 function gotIt() {
     doGuess(()=>game.guessGood());
 }
 
+/**
+ * The computer should make a guess, then display the results
+ */
 function doGuess(call) {
+    // Get and display the number guessed
     let num = call();
-    myGuess.val(num.toLocaleString());
     
+    // Get the list of all guesses made
     let hist = game.guessHistory;
     
+    // Update the controls available
     if (num === undefined) {
-        // No guess was made        
+        // No guess was made, show completion       
         compGuesses.hide();
         guessedIt.show();
     }
-    if (num < 0) {
-        // An error occurred        
+    else if (num < 0) {
+        // An error occurred, show the error
         compGuesses.hide();
         error.show();
     }
+    else {
+        // If there was a guess, show it
+        myGuess.val(num.toLocaleString());
+    }
     
+    // Display the history of guesses
     showGuesses(hist, guessList, numGuesses);
 }
 
+/**
+ * The computer should start a guessing game with itself
+ */
 function guessMyOwnNum() {
+    // Update the display
     bothStart.hide();
     beforePrompt.hide();
     guessingPrompt.show();
+    
+    // Show the secret number
+    updateDisplay(selfgame.secretNumber.toLocaleString(), secretNum);
        
+    // Make the guess and display it
     selfGuess(()=>selfgame.makeGuess());
 }
 
+/**
+ * The computer should make a guess against itself
+ */
 function selfGuess(call) {
+    // Guess a number and determine the result
     let num = call();
     let result = selfgame.madeGuess(num);
     
+    // Reset the click handler for the "Guess Again" button
     bothGuessButton.off("click");
     
+    // Update the display based on the result of the guess
     switch (result) {
         case "HIGHER":
             bothGuessButton.show();
@@ -340,11 +411,8 @@ function selfGuess(call) {
             break;
     }
     
-    
-    let hist = selfgame.userHistory;
-    
-    updateDisplay(selfgame.secretNumber.toLocaleString(), secretNum);
-    
+    // Display the history of guesses made.
+    let hist = selfgame.userHistory;    
     showGuesses(hist, bothGuessList, numMyGuesses);
 }
 
