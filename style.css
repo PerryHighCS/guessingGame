@@ -2,6 +2,11 @@ body {
     font-size: x-large;
 }
 
+.title {
+    padding: 20px !important;
+    margin-bottom: 20px;
+}
+
 .badge {
     background: #337ab7;
 }
