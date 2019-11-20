@@ -10,20 +10,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    
+<div class="container">    
     <div class="header clearfix">
         <h1 class="jumbotron title">Guess the number!</h1>
-        <ul class="nav nav-pills col-md-3" role="tablist">
+        <ul class="nav nav-pills col-sm-3" role="tablist">
             <li role="presentation" class="active"><a href="#youguess" aria-controls="youguess"  role="tab" data-toggle="pill">You Guess</a></li>
             <li role="presentation"><a href="#iguess" aria-controls="iguess" role="tab" data-toggle="pill">I Guess</a></li>
         </ul>
-        <div class="form-group col-md-9">
+        <div class="form-group col-sm-9">
             <label for="difficulty">
                 Difficulty: <span id="difficultyval">1</span>
             </label>
-            <input id="difficulty" type="range" min="1" max="7" 
-               class="slider" value="1"/>
+            <input id="difficulty" type="range" value="1" min="1" max="7" 
+               class="slider"/>
         </div>
     </div>
         
