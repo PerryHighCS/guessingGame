@@ -197,8 +197,9 @@ function showGuesses(guesses, list, guessNum, nextGuessNum ) {
                
         li.append(item);
         
-        let prompt = $('<div class="badge" style="font-size: .5em;">');
+        let prompt = $('<div class="badge" style="font-size: 1em;">');
         prompt.text(guess.prompt);
+        
         li.append(prompt);
         
         list.append(li);

@@ -2,6 +2,10 @@ body {
     font-size: x-large;
 }
 
+.badge {
+    background: #337ab7;
+}
+
 .clear {
     clear:both;
     line-height:0;
