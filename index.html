@@ -209,7 +209,13 @@ function showGuesses(guesses, list, guessNum, nextGuessNum ) {
     
     updateDisplay(guesses.length, guessNum);
     updateDisplay(guesses.length + 1, nextGuessNum);
-    list.show();
+    
+    if (guesses.length > 0) {
+        list.show();
+    }
+    else {
+        list.hide();
+    }
 }
 
 function makeGuess() {

@@ -25,6 +25,7 @@ body {
 .input-group,
 .list-group {
     margin-top: 20px;
+    margin-bottom: 0px;
 }
 .slider {
   -webkit-appearance: none;
