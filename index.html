@@ -11,27 +11,160 @@
 </head>
 <body>
 <div class="container">
+    
+    <div class="form-group">
+        <label for="difficulty">
+            Difficulty: <span id="difficultyval">1</span>
+        </label>
+        <input id="difficulty" type="range" min="1" max="7" 
+               class="slider" value="1"/>
+    </div>
     <div class="header clearfix">
-      <h3 class="text-muted">Guess the number!</h3>
+      <h2 class="text-muted">Guess the number!</h2>
       <nav>
-        <ul class="nav nav-pills" role="tablist">
-          <li role="presentation" class="active"><a href="#youguess" role="tab" data-toggle="pill">You Guess</a></li>
-          <li role="presentation"><a href="#iguess" aria-controls="iguess" role="tab" data-toggle="pill">I Guess</a></li>
-        </ul>
+        
       </nav>
     </div>
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="#youguess" aria-controls="youguess"  role="tab" data-toggle="pill">You Guess</a></li>
+        <li role="presentation"><a href="#iguess" aria-controls="iguess" role="tab" data-toggle="pill">I Guess</a></li>
+    </ul>
+    <div class="tab-content">        
+        <div role="tabpanel" class="tab-pane fade in active" id="youguess">
+            I'm thinking of a number between 1 and <span class="max"></span>.
+            Can you guess it in <span class="maxGuesses"></span> guesses?
+            <div class="input-group">
+                <span class="input-group-addon">
+                     Guess <span class="numUserGuess">1</span>:
+                </span>
+                <input type="number" id="nextGuess" class="form-control"
+                        placeholder="Your Guess" min="1"
+                        oninput="(!validity.rangeOverflow||(value=this.max)) 
+                                 && (!validity.rangeUnderflow||(value=this.min))
+                                 && (!validity.stepMismatch||(value=parseInt(this.value)))"
+                        />
+                <span class="input-group-btn">
+                    <button type="button" id="userGuess" class="btn btn-primary">
+                        Guess
+                    </button>
+                </span>
+            </div>
+            <div class="alert alert-info userPrompt" id="guesshigher" role="alert">
+                Guess Higher!
+            </div>
+            <div class="alert alert-info userPrompt" id="guesslower" role="alert">
+                Guess Lower!
+            </div>
+            <div class="alert alert-success userPrompt" id="gotit" role="alert">
+                You got it in <span class="numUserGuesses"></span>!
+                <button class="btn btn-primary pull-right again">Again!</button>
+            </div>
+            <ol class="list-group" style="display: none;" id="userGuessList">
 
-    <div class="tab-content">
-        
-        <div role="tabpanel" class="tab-pane active fade in" id="youguess">
-            I'm thinking of a number between 1 and _
+            </ol>
         </div> <!-- /youguess -->
         
         <div role="tabpanel" class="tab-pane fade" id="iguess">
-            Pick a number between 1 and _
+            Pick a number between 1 and <span class="max"></span>.
+            I'll guess it in <span class="maxGuesses"></span> guesses.
+            
+            <div class="startButton">
+                <button class="btn btn-success btn-lg btn-block">Start Guessing</button>
+            </div>
         </div> <!-- /iguess -->
         
     </div>
 </div> <!-- /container -->
+
+<script type="module">
+import {GuessingGame, updateDisplay} from "./guessingGame.js"
+
+var game;
+var difficultySlider = $('#difficulty');
+var userGuessInput = $('#nextGuess');
+var userGuessButton = $('#userGuess');
+var restartButton = $('.again');
+var userGuessList = $('#userGuessList');
+var numUserGuesses = $('.numUserGuesses');
+var numNextUserGuess = $('.numUserGuess');
+var startButton = $('.startButton');
+
+function startGame(difficulty) { 
+    
+    difficulty = parseInt(difficultySlider.val());
+    updateDisplay(difficulty, '#difficultyval');
+    
+    // calculate the range for guessing
+    let max = Math.pow(10, difficulty);
+    
+    game = new GuessingGame(max);
+    
+    userGuessInput.prop('max', max);
+    
+    updateDisplay(max.toLocaleString(),'.max');
+    updateDisplay(game.maxGuesses.toLocaleString(), '.maxGuesses');
+    updateDisplay(1, numNextUserGuess);
+    $('.userPrompt').hide();
+    
+    userGuessList.hide();
+
+}
+
+function userGuess(evt) {
+    let result = game.madeGuess(userGuessInput.val());    
+    
+    $('.userPrompt').hide();
+
+    if (result === "GOT IT!") {
+        // The player guessed it
+        $('#gotit').show();
+
+    }
+    else if (result ==="HIGHER") {
+        // The number is higher
+        $('#guesshigher').show();
+    }
+    else if (result === "LOWER") {
+        // The number is lower
+        $('#guesslower').show();
+    }
+    
+    showGuesses();
+}
+
+function showGuesses() {
+    let guesses = game.userHistory;
+    
+    userGuessList.empty();
+    
+    guesses.forEach((guess, i) => {
+        let li = $('<li class="list-group-item">');
+        
+        let item = $('<span>');
+        item.text((i + 1) + ") " + guess.val);        
+        li.append(item);
+        
+        let prompt = $('<span class="badge">');
+        prompt.text(guess.prompt);
+        li.append(prompt);
+        
+        userGuessList.append(li);
+    });
+    
+    
+    updateDisplay(guesses.length, numUserGuesses);
+    updateDisplay(guesses.length + 1, numNextUserGuess);
+    userGuessList.show();
+}
+
+// Setup event handlers
+difficultySlider.change(startGame);
+userGuessButton.click(userGuess);
+restartButton.click(startGame);
+startButton.click()
+
+// Start the default game
+startGame();
+</script>
 </body>
 </html>
