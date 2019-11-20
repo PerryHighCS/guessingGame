@@ -13,11 +13,12 @@
 <div class="container">    
     <div class="header clearfix">
         <h1 class="jumbotron title">Guess the number!</h1>
-        <ul class="nav nav-pills col-sm-3" role="tablist">
+        <ul class="nav nav-pills col-sm-5" role="tablist">
             <li role="presentation" class="active"><a href="#youguess" aria-controls="youguess"  role="tab" data-toggle="pill">You Guess</a></li>
             <li role="presentation"><a href="#iguess" aria-controls="iguess" role="tab" data-toggle="pill">I Guess</a></li>
+            <li role="presentation"><a href="#idoboth" aria-controls="idoboth" role="tab" data-toggle="pill">I'll do both</a></li>
         </ul>
-        <div class="form-group col-sm-9">
+        <div class="form-group col-sm-7">
             <label for="difficulty">
                 Difficulty: <span id="difficultyval">1</span>
             </label>
@@ -95,14 +96,42 @@
                         That's It!
                     </button>
                 </div>
-                <div class="alert alert-success userPrompt" id="igotit" role="alert">
+                <div class="alert alert-success compPrompt" id="igotit" role="alert">
                     I got it in <span class="numGuesses"></span>!
                     <button class="btn btn-primary pull-right again">Again!</button>
                 </div>
-                <div class="alert alert-warning userPrompt" id="error" role="alert">
+                <div class="alert alert-warning compPrompt" id="error" role="alert">
                     Are you messing with me?
                     <button class="btn btn-primary pull-right again">Again!</button>
                     <div class="clear"></div>
+                </div>
+            </div>
+        </div> <!-- /iguess -->
+        
+        <div role="tabpanel" class="tab-pane fade" id="idoboth">
+            <div class='prompt-before'>
+                I'll pick a number between 1 and <span class="max"></span>.
+                I'll guess it in <span class="maxGuesses"></span> or fewer guesses.
+            </div>
+            <div class='prompt-guessing'>
+                I picked the number <span class='secretNumber'></span>.
+                I'll guess it in <span class="maxGuesses"></span> or fewer guesses.
+            </div>
+            
+            <div id="bothGuesses" class="col-md-4 col-md-offset-4">
+                <ol class="list-group" style="display: none;" id="bothGuessList">
+
+                </ol>
+                <div class="startButton">
+                    <button class="btn btn-success btn-lg btn-block">Start Guessing</button>
+                </div>
+                <button type="button" id="bothGuess" style="display: none;"
+                        class="btn btn-primary btn-lg btn-block">
+                    Guess Again
+                </button>
+                <div class="alert alert-success selfPrompt" id="selfgotit" role="alert">
+                    I got it in <span class="numMyGuesses"></span>!
+                    <button class="btn btn-primary pull-right again">Again!</button>
                 </div>
             </div>
         </div> <!-- /iguess -->
@@ -113,6 +142,8 @@
 import {GuessingGame, updateDisplay} from "./guessingGame.js"
 
 var game;
+var selfgame;
+
 var difficultySlider = $('#difficulty');
 var userGuessInput = $('#nextGuess');
 var userGuessButton = $('#userGuess');
@@ -120,7 +151,7 @@ var restartButton = $('.again');
 var userGuessList = $('#userGuessList');
 var numUserGuesses = $('.numUserGuesses');
 var numNextUserGuess = $('.numUserGuess');
-var startButton = $('.startButton');
+var startButton = $('#iguess .startButton');
 var compGuesses = $('#compGuesses');
 var myGuess = $('#myGuess');
 var guessList = $('#guessList');
@@ -130,6 +161,15 @@ var higher = $('#higherGuess');
 var numGuesses = $('.numGuesses');
 var guessedIt = $('#igotit');
 var error = $('#error');
+var bothStart = $('#idoboth .startButton');
+var bothGuesses = $('#bothGuesses');
+var bothGuessList = $('#bothGuessList');
+var bothGuessButton = $('#bothGuess');
+var beforePrompt = $('.prompt-before');
+var guessingPrompt = $('.prompt-guessing');
+var numMyGuesses = $('.numMyGuesses');
+var selfGuessedIt = $('#selfgotit');
+var secretNum = $('.secretNumber');
 
 function startGame(difficulty) { 
     
@@ -140,6 +180,7 @@ function startGame(difficulty) {
     let max = Math.pow(10, difficulty);
     
     game = new GuessingGame(max);
+    selfgame = new GuessingGame(max);
     
     userGuessInput.prop('max', max);
     
@@ -147,6 +188,9 @@ function startGame(difficulty) {
     updateDisplay(game.maxGuesses.toLocaleString(), '.maxGuesses');
     updateDisplay(1, numNextUserGuess);
     $('.userPrompt').hide();
+    $('.compPrompt').hide();
+    $('.selfPrompt').hide();
+    
     
     userGuessList.hide();
     
@@ -155,6 +199,12 @@ function startGame(difficulty) {
     error.hide();
     compGuesses.hide();
     startButton.show();
+    
+    bothGuessList.hide();    
+    bothStart.show();    
+    
+    beforePrompt.show();
+    guessingPrompt.hide();
 }
 
 function userGuess(evt) {
@@ -179,8 +229,9 @@ function userGuess(evt) {
     showGuesses(game.userHistory, userGuessList, numUserGuesses, numNextUserGuess);
 }
 
-function showGuesses(guesses, list, guessNum, nextGuessNum ) {    
+function showGuesses(guesses, list, guessNum, nextGuessNum) {    
     list.empty();
+    console.log(guesses);
     
     guesses.forEach((guess, i) => {
         let li = $('<li class="list-group-item">');
@@ -192,7 +243,7 @@ function showGuesses(guesses, list, guessNum, nextGuessNum ) {
         item.append(num);
         
         num = $('<span style="margin-left: 20px;">');
-        num.text(guess.val);        
+        num.text(guess.val.toLocaleString());        
         item.append(num);
                
         li.append(item);
@@ -257,6 +308,48 @@ function doGuess(call) {
     
     showGuesses(hist, guessList, numGuesses);
 }
+
+function guessMyOwnNum() {
+    bothStart.hide();
+    beforePrompt.hide();
+    guessingPrompt.show();
+       
+    selfGuess(()=>selfgame.makeGuess());
+}
+
+function selfGuess(call) {
+    console.log (call);
+    let num = call();
+    let result = selfgame.madeGuess(num);
+    
+    bothGuessButton.off("click");
+    
+    switch (result) {
+        case "HIGHER":
+            bothGuessButton.show();
+            bothGuessButton.click(()=>selfGuess(()=>selfgame.guessHigher()));
+            break;
+            
+        case "LOWER":
+            bothGuessButton.show();
+            bothGuessButton.click(()=>selfGuess(()=>selfgame.guessLower()));
+            break;
+            
+        case "GOT IT!":
+            bothGuessButton.hide();
+            selfGuessedIt.show();
+            break;
+    }
+    
+    
+    let hist = selfgame.userHistory;
+    console.log(hist);
+    
+    updateDisplay(selfgame.secretNumber, secretNum);
+    
+    showGuesses(hist, bothGuessList, numMyGuesses);
+}
+
 // Setup event handlers
 difficultySlider.change(startGame);
 userGuessButton.click(userGuess);
@@ -265,6 +358,7 @@ startButton.click(makeGuess);
 lower.click(guessLower);
 higher.click(guessHigher);
 good.click(gotIt);
+bothStart.click(guessMyOwnNum);
 
 // Start the default game
 startGame();
